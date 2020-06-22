@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+  web:
+    build: web/
+    container_name: web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./src:/var/www/html
+    links:
+      - db
+  db:
+    image: mysql:5
+    container_name: db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    environment:
+       MYSQL_DATABASE: stock_helper
+       MYSQL_ROOT_PASSWORD: somepassword
+       TZ: Asia/Taipei
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+     - PMA_ARBITRARY=1
+     - PMA_HOST=db
+     - PMA_USER=root
+     - PMA_PASSWORD=somepassword
+    ports:
+     - 8080:80
+    volumes:
+     - /sessions
+  redis:
+    image: redis:latest
+    container_name: redis
+    #  oracle:
+    #    build: oracle/
+    #    container_name: oracle
+    #    ports:
+    #      - "5500:5500"
+    #      - "1521:1521"
+    #    shm_size: 1G
+    #    environment:
+    #     - ORACLE_PWD=oracle
+    #    volumes:
+    #      - ./oracle-data:/u01/app/oracle/oradata
