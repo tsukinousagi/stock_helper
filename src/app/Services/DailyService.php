@@ -78,7 +78,11 @@ class DailyService {
             echo($param . PHP_EOL);
             $r = $a->getGoodsPrice($param);
 //            $r = $a->getGoodsPrice($v . ',' . date('Ymd'));
-            $s = $a->saveGoodPrices($r);
+            if ($r) {
+                $s = $a->saveGoodPrices($r);
+            } else {
+                Log::error('取得個股價量資訊發生錯誤' . var_export($param));
+            }
         }
     }
 
@@ -96,6 +100,7 @@ class DailyService {
             // 打API取得正確價量資料並存入DB
             $codes = $item->code . ',' . substr($item->d_date, 0, 4) . substr($item->d_date, 5, 2) . substr($item->d_date, 8, 2);
             try {
+                echo($codes . PHP_EOL);
                 $price_data = $obj_price->getGoodsHistoryPrice($codes);
                 $ret = $obj_price->saveGoodPrices($price_data);
             } catch (Exception $e) {

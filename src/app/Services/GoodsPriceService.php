@@ -79,7 +79,7 @@ class GoodsPriceService {
         $url = sprintf($url, $url_goods_part);
         $r = $a->getUrl($url, 21600);
         $r_json = json_decode($r);
-        if ($r_json->rtcode == '0000') {
+        if (isset($r_json->rtcode) && ($r_json->rtcode == '0000')) {
             $price_data = [];
             foreach($r_json->msgArray as $v) {
                 $format = [];
