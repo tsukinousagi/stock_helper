@@ -6,6 +6,7 @@
 namespace App\Services;
 
 use App\Services\RemoteUrlService;
+use App\Services\MarketDaysService;
 use App\Repositories\GoodsRepository;
 use Illuminate\Support\Facades\Redis;
 use PHPHtmlParser\Dom;
@@ -23,6 +24,12 @@ class StockGoodsService {
      * 更新個股清單
      */
     public function updateStockGoods() {
+        // 檢查是不是交易日
+        $obj_day = new MarketDaysService();
+        if ($obj_day->isTodayMarketOpen() == false) {
+            echo('今天不是交易日' . PHP_EOL);
+            return false;
+        }
         // 資料來源網址
 //        $url_twse = 'http://cloud.usagi.tw/~usagi/usagilab/index.php/device_uptime/status/usagi/';
         $url_twse = 'https://isin.twse.com.tw/isin/C_public.jsp?strMode=2';

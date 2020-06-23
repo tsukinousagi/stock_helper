@@ -11,6 +11,10 @@ use Exception;
 
 class MarketDaysService {
     
+    public function isTodayMarketOpen() {
+        return $this->isMarketOpen(date('Ymd'));
+    }
+    
     /**
      * 查詢是否為交易日
      * @param string $d_date

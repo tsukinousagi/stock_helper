@@ -1,6 +1,8 @@
 <?php
 /**
  * 商品價量相關資料處理
+ * 
+ * todo 做一個每天掃沒有取得正確價量資訊的商品並發出通知的command
  */
 namespace App\Services;
 
@@ -10,6 +12,7 @@ use Exception;
 use App\Services\GoodsPriceService;
 use App\Services\GoodsHistoryPriceService;
 use App\Services\StockGoodsService;
+use App\Services\MarketDaysService;
 
 
 class DailyService {
@@ -19,6 +22,12 @@ class DailyService {
      * @return boolean
      */
     public function getTodayGoodsPrices() {
+        // 檢查是不是交易日
+        $obj_day = new MarketDaysService();
+        if ($obj_day->isTodayMarketOpen() == false) {
+            echo('今天不是交易日' . PHP_EOL);
+            return false;
+        }
         /*
         $a = Redis::set('orz', 'sto');
         var_dump(Redis::get('orz'));
