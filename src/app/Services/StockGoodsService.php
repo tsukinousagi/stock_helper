@@ -172,6 +172,10 @@ class StockGoodsService {
         
     }
     
+    /**
+     * 取得目前有效個股
+     * @return NULL[]
+     */
     public function getAllValidGoods() {
         $obj_goods = new GoodsRepository();
         $result = $obj_goods->getAllValidGoods();

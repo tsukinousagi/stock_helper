@@ -87,6 +87,24 @@ class MarketDaysService {
         return $new_date;
     }
     
+    /**
+     * 取得該月最後一個交易日
+     * @param string $d_date
+     * @return \App\Services\string
+     */
+    public function getLastMarketOpenDay(string $d_date) {
+        // 分離年月日
+        $d_year = substr($d_date, 0, 4);
+        $d_month = substr($d_date, 4, 2);
+        $d_day = substr($d_date, 6, 2);
+        $new_date = date('Ymt', mktime(0, 0, 0, $d_month, $d_day, $d_year));
+        while($this->isMarketOpen($new_date) == false) {
+            $new_date = $this->calculateDay($new_date, '-');
+        }
+        
+        return $new_date;
+    }
+    
     
     /**
      * 加減一天，不考慮交易日
