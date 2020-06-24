@@ -63,7 +63,8 @@ class RemoteUrlService {
         try {
             $obj_http = Http::get($url);
         } catch (Exception $e) {
-            Log::error($e->message);
+            Log::error('CURL連線異常');
+            Log::error($e->getLine() . ' ' . __CLASS__ . ':' . __FUNCTION__ . ' ' . $e->getMessage());
             return false;
         }
         return $obj_http->body();
