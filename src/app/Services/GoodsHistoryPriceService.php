@@ -92,7 +92,7 @@ class GoodsHistoryPriceService
             ])) {
                 // 上市或ETF部份
                 $r_json = json_decode($r);
-                if ($r_json->stat == 'OK') {
+                if (isset($r_json->stat) && ($r_json->stat == 'OK')) {
                     foreach ($r_json->data as $v2) {
                         $format = [];
                         // 代號
