@@ -100,6 +100,12 @@ class DailyService {
      * @return boolean
      */
     public function fixGoodsPrices() {
+        // 檢查是不是交易日
+        $obj_day = new MarketDaysService();
+        if ($obj_day->isTodayMarketOpen() == false) {
+            echo('今天不是交易日' . PHP_EOL);
+            return false;
+        }
         // 取得資料不完整的個股資料
         $obj_price = new GoodsHistoryPriceService();
         $problem_goods = $obj_price->getProblemGoods();
