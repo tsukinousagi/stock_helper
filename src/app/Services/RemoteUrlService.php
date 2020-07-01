@@ -4,7 +4,7 @@
  */
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Log;
@@ -59,15 +59,18 @@ class RemoteUrlService {
             sleep($this->expire_seconds);
         }
         $this->setExpireFlag();
-        // todo 加個try catch記錄錯誤
         try {
-            $obj_http = Http::get($url);
+            $http_client = new GuzzleHttp\Client();
+            $res = $http_client->request('GET', $url);
+//            $obj_http = Http::get($url);
         } catch (Exception $e) {
             Log::error('CURL連線異常');
             Log::error($e->getLine() . ' ' . __CLASS__ . ':' . __FUNCTION__ . ' ' . $e->getMessage());
+            Log::error($res->getStatusCode());
             return false;
         }
-        return $obj_http->body();
+        return $res->getBody();
+//        return $obj_http->body();
     }
     
     /**

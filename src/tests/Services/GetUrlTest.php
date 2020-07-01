@@ -11,7 +11,6 @@ class GetUrlTest extends TestCase
 {
     
     public function testGetUrl() {
-        $this->markTestSkipped();
         $a = new RemoteUrlService();
         $url = 'http://cloud.usagi.tw/~usagi/usagilab/index.php/device_uptime/status/usagi/';
         $r = $a->getUrl($url);
