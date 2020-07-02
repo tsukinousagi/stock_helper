@@ -49,4 +49,25 @@ class PricesRepository {
             ->get();
         return $problem_goods;
     }
+    
+    /**
+     * 取得特定個股特定日期價量
+     * @param string $code
+     * @param string $d_date
+     * @return number
+     */
+    public function getPriceData(string $code, string $d_date) {
+        $date_formatted = sprintf('%s-%s-%s 14:30:00',
+            substr($d_date, 0, 4),
+            substr($d_date, 4, 2),
+            substr($d_date, 6, 2));
+
+        $row = Prices::where('code', $code)
+            ->where('d_date', $date_formatted)
+            ->select('price_open', 'price_high', 'price_low', 'price_close', 'volume')
+            ->get();
+
+        return $row;
+        
+    }
 }
