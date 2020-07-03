@@ -41,13 +41,15 @@ class PricesRepository {
     public function getProblemGoods() {
 //        var_dump(Carbon::now()->subDays(180)->toDateTimeString());
 //        \DB::enableQueryLog();
-        $problem_goods = Prices::where('price_open', '=', -1)
+        $problem_goods = Prices::where(function ($query) {
+            $query->where('price_open', '=', -1)
             ->orWhere('price_high', '=', -1)
             ->orWhere('price_low', '=', -1)
             ->orWhere('price_close', '=', -1)
-            ->orWhere('volume', '=', -1)
+            ->orWhere('volume', '=', -1);
+        }) 
             // 180天前的資料就算了
-//            ->orWhereRaw("`d_date` >= '" . Carbon::now()->subDays(180)->toDateTimeString() . "'")
+            ->whereRaw("`d_date` >= '" . Carbon::now()->subDays(180)->toDateTimeString() . "'")
             ->select('d_date', 'code')
             ->orderBy('d_date', 'desc')
             ->orderBy('code', 'asc')
