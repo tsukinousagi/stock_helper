@@ -68,6 +68,10 @@ class RemoteUrlService {
             Log::error($e->getLine() . ' ' . __CLASS__ . ':' . __FUNCTION__ . ' ' . $e->getMessage());
             Log::error($res->getStatusCode());
             return false;
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            Log::error('Guzzle連線異常');
+            Log::error($e->getLine() . ' ' . __CLASS__ . ':' . __FUNCTION__ . ' ' . $e->getMessage());
+            return false;
         }
         return $res->getBody();
 //        return $obj_http->body();
