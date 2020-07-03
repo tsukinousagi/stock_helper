@@ -5,6 +5,7 @@
  * 另一支API https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=20200617&stockNo=1213&_=1592384560673
  * https://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&d=109/06&stkno=8044&_=1592405228637
  * 查有問題的資料 SELECT * FROM `prices` WHERE (price_open = (-1) or price_high  = (-1) or price_low  = (-1) or  price_close  = (-1) or volume  = (-1)) and d_date = '2020-06-17 14:30:00'
+ * 
  */
 namespace App\Services;
 
@@ -247,8 +248,16 @@ class GoodsPriceService {
         while ($days > 0) {
             // 檢查這一天所有商品資料
             foreach($goods as $v) {
+                // todo 把檢查單一個股的部份獨立出function
                 $date_flag = false;
                 $good_flag = false;
+                
+                $ret = $this->checkPriceDataByGoodAndDate($v, $d_date);
+                if ($ret) {
+                    $date_flag = true;
+                    $good_flag = true;
+                }
+                /*
                 // 開盤價
                 $data = $obj_graph->getGoodGraphData($v, $d_date, GoodsGraphDataType::PriceOpen());
                 if (($data == false) || ($data <= 0)) {
@@ -284,6 +293,7 @@ class GoodsPriceService {
                     $date_flag = true;
                     $good_flag = true;
                 }
+                */
                 // 記錄錯誤的交易日
                 if ($date_flag) {
                     if (isset($problem_dates[$d_date])) {
@@ -321,6 +331,121 @@ class GoodsPriceService {
         }
 
         return true;
+    }
+
+    /**
+     * 指定商品，檢查資料庫中的價量資訊
+     * @return boolean
+     */
+
+    public function checkPriceDataByGood(string $good) {
+        $obj_goods = new StockGoodsService();
+        $obj_days = new MarketDaysService();
+        $obj_graph = new GoodsGraphService();
+
+        $days = 110; // 設定檢查幾個交易日
+        $problem_goods = []; // 記錄有問題的商品
+        $problem_dates = []; // 記錄有問題的日期
+        
+        $good_flag = false;
+        $date_flag = false;
+
+        // 逐日檢查個股價量資訊是否完整
+        $d_date = date('Ymd');
+        if ($obj_days->isMarketOpen($d_date) == false) {
+            // 今天不是交易日的話，往前推到上一個交易日
+            $d_date = $obj_days->calculateMarketDays($d_date, '-', 1);
+        }
+        while ($days > 0) {
+            // 檢查這一天所有商品資料
+            $date_flag = false;
+            $good_flag = false;
+            
+            $ret = $this->checkPriceDataByGoodAndDate($good, $d_date);
+            if ($ret) {
+                $date_flag = true;
+                $good_flag = true;
+            }
+            // 記錄錯誤的交易日
+            if ($date_flag) {
+                if (isset($problem_dates[$d_date])) {
+                    $problem_dates[$d_date]++;
+                } else {
+                    $problem_dates[$d_date] = 1;
+                }
+            }
+            // 記錄錯誤的個股
+            if ($good_flag) {
+                if (isset($problem_goods[$good])) {
+                    $problem_goods[$good]++;
+                } else {
+                    $problem_goods[$good] = 1;
+                }
+            }
+            $date_flag = false;
+            $good_flag = false;
+            // 找上一個交易日
+            $d_date = $obj_days->calculateMarketDays($d_date, '-', 1);
+            $days--;
+        }
+        
+        // 顯示錯誤資料統計
+        arsort($problem_dates);
+        arsort($problem_goods);
+        echo('資料有問題的日期' . PHP_EOL);
+        foreach($problem_dates as $k => $v) {
+            echo(sprintf("%s\t%s", $k, $v) . PHP_EOL);
+        }
+        echo('資料有問題的個股' . PHP_EOL);
+        foreach($problem_goods as $k => $v) {
+            echo(sprintf("%s\t%s", $k, $v) . PHP_EOL);
+        }
+
+        return true;
+    }
+    
+    /**
+     * 檢查指定日期個股的價量資料
+     * @param string $good
+     * @param string $d_date
+     * @return boolean
+     */
+    public function checkPriceDataByGoodAndDate(string $good, string $d_date) {
+        $obj_graph = new GoodsGraphService();
+
+        $good_flag = false;
+
+        // 開盤價
+        $data = $obj_graph->getGoodGraphData($good, $d_date, GoodsGraphDataType::PriceOpen());
+        if (($data == false) || ($data <= 0)) {
+            echo(sprintf("%s\t在%s的開盤價錯誤：%s", $good, $d_date, serialize($data)) . PHP_EOL);
+            $good_flag = true;
+        }
+        // 最高價
+        $data = $obj_graph->getGoodGraphData($good, $d_date, GoodsGraphDataType::PriceHigh());
+        if (($data == false) || ($data <= 0)) {
+            echo(sprintf("%s\t在%s的最高價錯誤：%s", $good, $d_date, serialize($data)) . PHP_EOL);
+            $good_flag = true;
+        }
+        // 最低價
+        $data = $obj_graph->getGoodGraphData($good, $d_date, GoodsGraphDataType::PriceLow());
+        if (($data == false) || ($data <= 0)) {
+            echo(sprintf("%s\t在%s的最低價錯誤：%s", $good, $d_date, serialize($data)) . PHP_EOL);
+            $good_flag = true;
+        }
+        // 收盤價
+        $data = $obj_graph->getGoodGraphData($good, $d_date, GoodsGraphDataType::PriceClose());
+        if (($data == false) || ($data <= 0)) {
+            echo(sprintf("%s\t在%s的收盤價錯誤：%s", $good, $d_date, serialize($data)) . PHP_EOL);
+            $good_flag = true;
+        }
+        // 成交量
+        $data = $obj_graph->getGoodGraphData($good, $d_date, GoodsGraphDataType::Volume());
+        if (($data == false) || ($data < 0)) {
+            echo(sprintf("%s\t在%s的成交量錯誤：%s", $good, $d_date, serialize($data)) . PHP_EOL);
+            $good_flag = true;
+        }
+        return $good_flag;
     }
 
     /**
