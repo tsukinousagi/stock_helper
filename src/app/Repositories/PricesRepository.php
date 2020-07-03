@@ -4,6 +4,7 @@ namespace App\Repositories;
 use Log;
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Prices;
+use Carbon\Carbon;
 
 class PricesRepository {
     /**
@@ -38,15 +39,20 @@ class PricesRepository {
      * @return array
      */
     public function getProblemGoods() {
+//        var_dump(Carbon::now()->subDays(180)->toDateTimeString());
+//        \DB::enableQueryLog();
         $problem_goods = Prices::where('price_open', '=', -1)
             ->orWhere('price_high', '=', -1)
             ->orWhere('price_low', '=', -1)
             ->orWhere('price_close', '=', -1)
             ->orWhere('volume', '=', -1)
+            // 180天前的資料就算了
+//            ->orWhereRaw("`d_date` >= '" . Carbon::now()->subDays(180)->toDateTimeString() . "'")
             ->select('d_date', 'code')
             ->orderBy('d_date', 'desc')
             ->orderBy('code', 'asc')
             ->get();
+//        var_dump(\DB::getQueryLog());
         return $problem_goods;
     }
     
