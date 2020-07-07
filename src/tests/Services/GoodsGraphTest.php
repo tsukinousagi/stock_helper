@@ -78,21 +78,21 @@ class GoodsGraphTest extends TestCase
         $obj_service = new GoodsGraphService();
         // 5日均價27.92向下
         $result = $obj_service->getGoodGraphData('2884', '20200623', GoodsGraphDataType::Price5MADirection());
-        $this->assertEquals(GoodsGraphMADirection::MADDown(), $result);
+        $this->assertEquals(GoodsGraphMADirection::MADDown, $result);
     }
     public function testGetPrices288420200623Price10MADirection()
     {
         $obj_service = new GoodsGraphService();
         // 10日均價27.92向下
         $result = $obj_service->getGoodGraphData('2884', '20200623', GoodsGraphDataType::Price10MADirection());
-        $this->assertEquals(GoodsGraphMADirection::MADDown(), $result);
+        $this->assertEquals(GoodsGraphMADirection::MADDown, $result);
     }
     public function testGetPrices288420200623Price20MADirection()
     {
         $obj_service = new GoodsGraphService();
         // 20日均價27.74向上
         $result = $obj_service->getGoodGraphData('2884', '20200623', GoodsGraphDataType::Price20MADirection());
-        $this->assertEquals(GoodsGraphMADirection::MADUp(), $result);
+        $this->assertEquals(GoodsGraphMADirection::MADUp, $result);
     }
 
     /**
@@ -159,20 +159,20 @@ class GoodsGraphTest extends TestCase
         $obj_service = new GoodsGraphService();
         // 5日均價78.92向上
         $result = $obj_service->getGoodGraphData('2317', '20200623', GoodsGraphDataType::Price5MADirection());
-        $this->assertEquals(GoodsGraphMADirection::MADUp(), $result);
+        $this->assertEquals(GoodsGraphMADirection::MADUp, $result);
     }
     public function testGetPrices231720200623Price10MADirection()
     {
         $obj_service = new GoodsGraphService();
         // 10日均價78.65向上
         $result = $obj_service->getGoodGraphData('2317', '20200623', GoodsGraphDataType::Price10MADirection());
-        $this->assertEquals(GoodsGraphMADirection::MADUp(), $result);
+        $this->assertEquals(GoodsGraphMADirection::MADUp, $result);
     }
     public function testGetPrices231720200623Price20MADirection()
     {
         $obj_service = new GoodsGraphService();
         // 20日均價78.02向上
         $result = $obj_service->getGoodGraphData('2317', '20200623', GoodsGraphDataType::Price20MADirection());
-        $this->assertEquals(GoodsGraphMADirection::MADUp(), $result);
+        $this->assertEquals(GoodsGraphMADirection::MADUp, $result);
     }
 }

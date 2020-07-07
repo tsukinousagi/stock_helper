@@ -138,7 +138,6 @@ class GoodsGraphService {
                 $ma = array_sum($price_each_day) / $ma_days;
                 Log::info($good . ' ' . $d_date . ' ' . $ma_days . ' ' . $ma);
                 $fix_digits = 2;
-                // todo 依股價高低決定round到多少小數位
                 /*
                 $pow = pow(10, $fix_digits);
                 $ma = floor($ma * $pow) / $pow;
@@ -169,11 +168,11 @@ class GoodsGraphService {
         $previous_ma = $this->getGoodMAPrice($good, $previous_day, $ma_days);
         // 比對
         if ($previous_ma < $this_ma) {
-            $direction = GoodsGraphMADirection::MADUp();
+            $direction = GoodsGraphMADirection::MADUp;
         } else if ($previous_ma > $this_ma) {
-            $direction = GoodsGraphMADirection::MADDown();
+            $direction = GoodsGraphMADirection::MADDown;
         } else if ($previous_ma == $this_ma) {
-            $direction = GoodsGraphMADirection::MADFlat();
+            $direction = GoodsGraphMADirection::MADFlat;
         } else {
             $direction = false;
         }
