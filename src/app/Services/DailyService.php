@@ -2,7 +2,6 @@
 /**
  * 商品價量相關資料處理
  * 
- * todo 做一個每天掃沒有取得正確價量資訊的商品並發出通知的command
  */
 namespace App\Services;
 

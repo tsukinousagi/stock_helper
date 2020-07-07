@@ -248,7 +248,6 @@ class GoodsPriceService {
         while ($days > 0) {
             // 檢查這一天所有商品資料
             foreach($goods as $v) {
-                // todo 把檢查單一個股的部份獨立出function
                 $date_flag = false;
                 $good_flag = false;
                 
@@ -257,43 +256,6 @@ class GoodsPriceService {
                     $date_flag = true;
                     $good_flag = true;
                 }
-                /*
-                // 開盤價
-                $data = $obj_graph->getGoodGraphData($v, $d_date, GoodsGraphDataType::PriceOpen());
-                if (($data == false) || ($data <= 0)) {
-                    echo(sprintf("%s\t在%s的開盤價錯誤：%s", $v, $d_date, serialize($data)) . PHP_EOL);
-                    $date_flag = true;
-                    $good_flag = true;
-                }
-                // 最高價
-                $data = $obj_graph->getGoodGraphData($v, $d_date, GoodsGraphDataType::PriceHigh());
-                if (($data == false) || ($data <= 0)) {
-                    echo(sprintf("%s\t在%s的最高價錯誤：%s", $v, $d_date, serialize($data)) . PHP_EOL);
-                    $date_flag = true;
-                    $good_flag = true;
-                }
-                // 最低價
-                $data = $obj_graph->getGoodGraphData($v, $d_date, GoodsGraphDataType::PriceLow());
-                if (($data == false) || ($data <= 0)) {
-                    echo(sprintf("%s\t在%s的最低價錯誤：%s", $v, $d_date, serialize($data)) . PHP_EOL);
-                    $date_flag = true;
-                    $good_flag = true;
-                }
-                // 收盤價
-                $data = $obj_graph->getGoodGraphData($v, $d_date, GoodsGraphDataType::PriceClose());
-                if (($data == false) || ($data <= 0)) {
-                    echo(sprintf("%s\t在%s的收盤價錯誤：%s", $v, $d_date, serialize($data)) . PHP_EOL);
-                    $date_flag = true;
-                    $good_flag = true;
-                }
-                // 成交量
-                $data = $obj_graph->getGoodGraphData($v, $d_date, GoodsGraphDataType::Volume());
-                if (($data == false) || ($data < 0)) {
-                    echo(sprintf("%s\t在%s的成交量錯誤：%s", $v, $d_date, serialize($data)) . PHP_EOL);
-                    $date_flag = true;
-                    $good_flag = true;
-                }
-                */
                 // 記錄錯誤的交易日
                 if ($date_flag) {
                     if (isset($problem_dates[$d_date])) {
