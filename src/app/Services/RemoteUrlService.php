@@ -78,6 +78,16 @@ class RemoteUrlService {
     }
     
     /**
+     * 設定打api的間隔時間
+     * @param int $seconds
+     * @return boolean
+     */
+    public function setCooldownTime(int $seconds) {
+        $this->expire_seconds = $seconds;
+        return true;
+    }
+    
+    /**
      * 設定過期旗標
      */
     private function setExpireFlag() {
@@ -86,6 +96,9 @@ class RemoteUrlService {
         $this->obj_redis->expire('get_url_expire', $this->expire_seconds);
     }
     
+    /**
+     * 取得過期旗標
+     */
     private function getExpireFlag() {
 //        Log::info(__FUNCTION__ . PHP_EOL);
         return $this->obj_redis->get('get_url_expire');
