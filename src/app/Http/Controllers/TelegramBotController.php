@@ -11,9 +11,9 @@ class TelegramBotController extends Controller
     //
     public function webhook(Request $request) {
         Log::info(__CLASS__ . ':' . __FUNCTION__);
-        $updates = Telegram::getWebhookUpdates();
-        Log::info($updates);
-        $response = Telegram::commandsHandler(false, ['timeout' => 30]);
+//        $updates = Telegram::getWebhookUpdates();
+//        Log::info($updates);
+        $response = Telegram::commandsHandler(true);
         Log::info($response);
         return 'ok';
     }
