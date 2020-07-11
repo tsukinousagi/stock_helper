@@ -133,5 +133,21 @@ class MarketDaysService {
         // 組回日期
         return date('Ymd', $ts);
     }
+    
+    /**
+     * 收盤了沒？
+     * @return boolean
+     */
+    public function isCurrentlyMarketClosed() {
+        if ($this->isTodayMarketOpen()) {
+            if (time() < mktime(14, 35, 00)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
 
 }

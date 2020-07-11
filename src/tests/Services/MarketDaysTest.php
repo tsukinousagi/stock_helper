@@ -96,4 +96,15 @@ class MarketDaysTest extends TestCase
         $new_date = $obj->calculateMarketDays('20200625', '+', 1);
         $this->assertEquals('20200629', $new_date);
     }
+    
+    /**
+     * 檢查收盤時間
+     */
+    public function testMarketClosed() {
+        $obj = new MarketDaysService();
+        $ret = $obj->isCurrentlyMarketClosed();
+        $this->assertEquals(true, $ret);
+        
+    }
+    
 }
