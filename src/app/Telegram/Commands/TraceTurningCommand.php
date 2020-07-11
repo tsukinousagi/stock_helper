@@ -13,7 +13,7 @@ class TraceTurningCommand extends Command
     /**
      * @var string Command Name
      */
-    protected $name = "traceturning";
+    protected $name = "tt";
     
     /**
      * @var string Command Description
