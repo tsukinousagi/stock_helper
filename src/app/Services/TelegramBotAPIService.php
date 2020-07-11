@@ -38,7 +38,7 @@ class TelegramBotAPIService {
             'url' => env('APP_URL') . 'telegram_me'
         ]);
         $tmp = $response->getDecodedBody();
-        Log::info($response);
+        Log::info(json_encode($response));
         return $tmp['ok'];
     }
 
@@ -49,7 +49,7 @@ class TelegramBotAPIService {
     public function deleteWebhook() {
         $response = Telegram::removeWebhook();
         $tmp = $response->getDecodedBody();
-        Log::info($response);
+        Log::info(json_encode($response));
         return $tmp['ok'];
     }
 }
