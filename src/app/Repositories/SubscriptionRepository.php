@@ -70,8 +70,16 @@ class SubscriptionRepository {
      */
     public function getSubscriptionByChatId(string $telegram_chat_id) {
         $subscriptions = Subscriptions::where('telegram_chat_id', $telegram_chat_id)
-        ->where('expire_at', '>', date('Y-m-d') . ' 00:00:00')
+        ->where('expire_at', '>', date('Y-m-d H:i:s'))
         ->get();
+        return $subscriptions;
+    }
+
+    public function countTraceTurningByChatId(string $telegram_chat_id) {
+        $subscriptions = Subscriptions::where('telegram_chat_id', $telegram_chat_id)
+        ->where('goods_trace_type', '=', GoodsTraceType::Turning)
+        ->where('expire_at', '>', date('Y-m-d H:i:s'))
+        ->count();
         return $subscriptions;
     }
     // todo 清除所有過期的訂閱
