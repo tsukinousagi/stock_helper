@@ -25,19 +25,20 @@ class SubscriptionService {
         // 檢查訂閱數量
         $trace_turning_count = $obj_subscription->countTraceTurningByChatId($telegram_chat_id);
         $msg = 'blah';
-        if (($telegram_chat_id <> env('DEVELOPER_CHATID')) && ($trace_turning_count >= (int) env('TRACE_TURNING_LIMIT'))) {
-            $msg = "抱歉，你的商品追蹤數量已達上限，請刪除不需要的商品。\n";
-            $msg .= $this->getSubscriptionsByChatId($telegram_chat_id);
-        } else {
-            // 先看看這個股在不在
-            if ($obj_goods->getGoodsType($goods)) {
-                $goods_name = $obj_goods->getGoodsName($goods);
-                $msg = $goods . ' ' . $goods_name . ':';
-                // 先取得合理的結束日期
-                $expire_at = $this->getExpireDateTime();
-                // 先看看訂閱條件在不在
-                $ret = $obj_subscription->getSubscription($telegram_chat_id, $goods, $goods_trace_type);
-                if (sizeof($ret) <= 0) {
+
+        // 先看看這個股在不在
+        if ($obj_goods->getGoodsType($goods)) {
+            $goods_name = $obj_goods->getGoodsName($goods);
+            $msg = $goods . ' ' . $goods_name . ':';
+            // 先取得合理的結束日期
+            $expire_at = $this->getExpireDateTime();
+            // 先看看訂閱條件在不在
+            $ret = $obj_subscription->getSubscription($telegram_chat_id, $goods, $goods_trace_type);
+            if (sizeof($ret) <= 0) {
+                if (($telegram_chat_id <> env('DEVELOPER_CHATID')) && ($trace_turning_count >= (int) env('TRACE_TURNING_LIMIT'))) {
+                    $msg = "抱歉，你的商品追蹤數量已達上限，請刪除不需要的商品。\n";
+                    $msg .= $this->getSubscriptionsByChatId($telegram_chat_id);
+                } else {
                     // 新增
                     $ret2 = $obj_subscription->updateSubscription($telegram_chat_id, $goods, $goods_trace_type, $expire_at);
                     $msg .= "股價轉折通知已設定\n";
@@ -53,15 +54,16 @@ class SubscriptionService {
                         $msg .= '今天沒有開盤，於下一個交易日開盤後通知股價轉折，至收盤結束';
                     }
                     $msg .= "\n想取消通知，再輸入一次相同指令即可";
-                } else {
-                    // 刪除
-                    $ret2 = $obj_subscription->deleteSubscription($telegram_chat_id, $goods, $goods_trace_type, $expire_at);
-                    $msg .= "股價轉折通知已刪除\n想再次設定，再輸入一次相同指令即可";
                 }
             } else {
-                $msg = '指定的商品代號不存在！';
+                // 刪除
+                $ret2 = $obj_subscription->deleteSubscription($telegram_chat_id, $goods, $goods_trace_type, $expire_at);
+                $msg .= "股價轉折通知已刪除\n想再次設定，再輸入一次相同指令即可";
             }
+        } else {
+            $msg = '指定的商品代號不存在！';
         }
+
         
         return $msg;
     }
