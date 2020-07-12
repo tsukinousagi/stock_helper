@@ -2,7 +2,6 @@
 /**
  * Telegram Webhook相關
  * 
- * todo 寫個可以透過web開關webhook的功能
  * todo 寫個直接輸入個股就能操作相關功能的機制
  */
 

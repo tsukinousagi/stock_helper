@@ -58,6 +58,7 @@ return [
     'commands' => [
         App\Telegram\Commands\StartCommand::class,
         App\Telegram\Commands\TraceTurningCommand::class,
+        App\Telegram\Commands\SubscriptionListCommand::class,
 //        Telegram\Bot\Commands\HelpCommand::class,
     ],
 ];

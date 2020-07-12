@@ -62,12 +62,42 @@ class SubscriptionService {
     
     /**
      * 取得某chat_id目前所有的訂閱
+     * todo 寫個指令讓使用者看
      * @param string $telegram_chat_id
      * @return \App\Repositories\unknown
      */
     public function getSubscriptionsByChatId(string $telegram_chat_id) {
         $obj_subscription = new SubscriptionRepository();
-        return $obj_subscription->getSubscriptionByChatId($telegram_chat_id);
+        $obj_goods = new StockGoodsService();
+        // 依訂閱類別作整理
+        $ret = $obj_subscription->getSubscriptionByChatId($telegram_chat_id);
+        $a_result = [];
+        foreach($ret as $k => $v) {
+            if (!isset($a_result[$v['goods_trace_type']])) {
+                $a_result[$v['goods_trace_type']] = [];
+            }
+            $a_result[$v['goods_trace_type']][] = $v['goods'];
+        }
+        
+        // 整理成文字輸出
+        $msg = "以下是你目前的設定：\n\n";
+        
+        if (sizeof($a_result) > 0) {
+            foreach($a_result as $k2 => $v2) {
+                if ($k2 == GoodsTraceType::Turning) {
+                    $msg .= "股價轉折通知：\n";
+                    $goods = sort($v2);
+                    foreach($v2 as $v3) {
+                        $goods_name = $obj_goods->getGoodsName($v3);
+                        $msg .= "- " . $v3 . " " . $goods_name . "\n";
+                    }
+                }
+            }
+        } else {
+            $msg .= "無\n";
+        }
+        
+        return $msg;
     }
     
     

@@ -1,4 +1,7 @@
 <?php
+/**
+ * 追蹤股價轉折
+ */
 
 namespace App\Telegram\Commands;
 
