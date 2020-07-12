@@ -19,3 +19,4 @@ Route::get('/', function () {
 Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 Route::post('/telegram_me', 'TelegramBotController@webhook');
+Route::get('/telegram/webhook/{toggle}', 'TelegramBotController@webhookToggle');
