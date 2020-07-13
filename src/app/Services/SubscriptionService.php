@@ -46,9 +46,9 @@ class SubscriptionService {
                     $obj_days = new MarketDaysService();
                     $today_open = $obj_days->isTodayMarketOpen();
                     $time_closed = $obj_days->isCurrentlyMarketClosed();
-                    if (($today_open == true) && ($time_close == false)) {
+                    if (($today_open == true) && ($time_closed == false)) {
                         $msg .= '今天還沒收盤，設定股價轉折通知至今天收盤結束';
-                    } else if (($today_open == true) && ($time_close == true)) {
+                    } else if (($today_open == true) && ($time_closed == true)) {
                         $msg .= '今天收盤了，於下一個交易日開盤後通知股價轉折，至收盤結束';
                     } else {
                         $msg .= '今天沒有開盤，於下一個交易日開盤後通知股價轉折，至收盤結束';
