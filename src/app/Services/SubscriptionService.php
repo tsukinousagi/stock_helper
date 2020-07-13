@@ -33,7 +33,7 @@ class SubscriptionService {
             // 先取得合理的結束日期
             $expire_at = $this->getExpireDateTime();
             // 先看看訂閱條件在不在
-            $ret = $obj_subscription->getSubscription($telegram_chat_id, $goods, $goods_trace_type);
+            $ret = $obj_subscription->getSubscription($telegram_chat_id, $goods, $goods_trace_type, $expire_at);
             if (sizeof($ret) <= 0) {
                 if (($telegram_chat_id <> env('DEVELOPER_CHATID')) && ($trace_turning_count >= (int) env('TRACE_TURNING_LIMIT'))) {
                     $msg = "抱歉，你的商品追蹤數量已達上限，請刪除不需要的商品。\n";
@@ -131,7 +131,7 @@ class SubscriptionService {
             $expire_at = $obj_days->calculateMarketDays(date('Ymd'), '+', 1);
             $expire_at = substr($expire_at, 0, 4) . '-' . substr($expire_at, 4, 2) . '-' . substr($expire_at, 6, 2) . ' 14:35:00';
         } else {
-            $expire_at = date('Y-m-d') . ' 14:35:00';
+            $expire_at = date('Y-m-d') . ' 13:35:00';
         }
         
         return $expire_at;

@@ -36,11 +36,11 @@ class SubscriptionRepository {
      * @param GoodsTraceType $goods_trace_type
      * @return unknown
      */
-    public function getSubscription(string $telegram_chat_id, string $goods, GoodsTraceType $goods_trace_type) {
+    public function getSubscription(string $telegram_chat_id, string $goods, GoodsTraceType $goods_trace_type, string $market_closed_time) {
         $subscriptions = Subscriptions::where('telegram_chat_id', $telegram_chat_id)
         ->where('goods', $goods)
         ->where('goods_trace_type', $goods_trace_type)
-        ->where('expire_at', '>', date('Y-m-d') . ' 00:00:00')
+        ->where('expire_at', '>', $market_closed_time)
         ->get();
         return $subscriptions;
     }
