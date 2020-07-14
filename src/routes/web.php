@@ -20,3 +20,5 @@ Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
 Route::post('/telegram_me', 'TelegramBotController@webhook');
 Route::get('/telegram/webhook/{toggle}', 'TelegramBotController@webhookToggle');
+
+Route::get('/fake_fugle_graph', 'FakeFugleAPIController@getGoodsRealtimeData');
