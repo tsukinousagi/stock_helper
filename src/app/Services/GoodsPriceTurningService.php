@@ -101,11 +101,11 @@ class GoodsPriceTurningService {
      */
     public function getDirectionText(float $direction) {
         if ($direction > 0) {
-            return '漲';
+            return '△漲';
         } else if ($direction < 0) {
-            return '跌';
+            return '▼跌';
         } else {
-            return '平';
+            return '＝平';
         }
     }
     

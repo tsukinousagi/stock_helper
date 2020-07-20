@@ -130,7 +130,7 @@ class GoodsRealtimePriceService {
         // 寫入轉折記錄
         foreach($goods_direction_changed as $v4) {
             // todo 發通知
-            $telegram_message = sprintf('%s價格出現轉折：%s', 
+            $telegram_message = sprintf('%s：%s', 
                 $v4['goods'] . $obj_goods->getGoodsName($v4['goods']), 
                 $obj_turning->getDirectionText($v4['direction'])
             );
