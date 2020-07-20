@@ -41,6 +41,6 @@ class GetRealtimePriceByMinute extends Command
         //
         $obj_realtime = new GoodsRealtimePriceService();
         $ret = $obj_realtime->getGoodsRealtimeData();
-        echo($ret);
+//        echo($ret);
     }
 }

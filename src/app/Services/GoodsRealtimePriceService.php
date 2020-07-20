@@ -47,6 +47,9 @@ class GoodsRealtimePriceService {
      * @return string
      */
     public function getGoodsRealtimeData() {
+        // 測量執行時間
+        $ts_begin = time();
+
         $obj_price_minute = new PricesMinuteRepository();
         $obj_subscription = new SubscriptionService();
         $obj_turning = new GoodsPriceTurningService();
@@ -192,6 +195,9 @@ class GoodsRealtimePriceService {
             $ret2 = Storage::put($save_to, $ret);
         }
         */
+        // 測量執行時間
+        $ts_end = time();
+        echo(sprintf('執行時間%.2f秒', ($ts_end - $ts_begin)));
         return true;
     }
     
