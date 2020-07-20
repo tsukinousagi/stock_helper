@@ -52,4 +52,18 @@ class TelegramBotAPIService {
         Log::info(json_encode($response));
         return $tmp['ok'];
     }
+    
+    /**
+     * 透過BOT發送訊息
+     * @param string $chatid
+     * @param string $text
+     * @return unknown
+     */
+    public function sendMessageViaTelegramBot(string $chatid, string $text) {
+        $response = Telegram::sendMessage([
+            'chat_id' => $chatid,
+            'text' => $text,
+        ]);
+        return $response;
+    }
 }
