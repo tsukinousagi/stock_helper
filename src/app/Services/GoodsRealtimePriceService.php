@@ -63,7 +63,7 @@ class GoodsRealtimePriceService {
 
         // 先取得目前在監控期間的有哪些個股
         // todo 限制數量避免把API打爆
-        $goods = $obj_subscription->getAllActiveSubscriptions(GoodsTraceType::Turning());
+        // $goods = $obj_subscription->getAllActiveSubscriptions(GoodsTraceType::Turning());
 
         // 目前先為了程式開發方便，先直接打API並存成文字檔，做模擬用的API
         $goods = [

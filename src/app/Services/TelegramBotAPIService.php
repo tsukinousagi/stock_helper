@@ -39,7 +39,7 @@ class TelegramBotAPIService {
         ]);
         $tmp = $response->getDecodedBody();
         Log::info(json_encode($response));
-        return $tmp['ok'];
+        return $tmp;
     }
 
     /**
