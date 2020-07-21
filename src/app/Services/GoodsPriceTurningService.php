@@ -19,7 +19,7 @@ class GoodsPriceTurningService {
      */
     public function findPriceDirection(array $graph_data) {
         $obj_updown = new GoodsPriceUpDownService();
-        $threshold = 0.5; // 漲跌幅多少才達到確認方向的門檻
+        $threshold = 0.6; // 漲跌幅多少才達到確認方向的門檻
         
         // 找出目前價格作比對基準
         $changed_data = end($graph_data);

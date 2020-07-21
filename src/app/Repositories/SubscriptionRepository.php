@@ -75,11 +75,31 @@ class SubscriptionRepository {
         return $subscriptions;
     }
 
+    /**
+     * 取得某人目前訂閱了幾檔個股
+     * @param string $telegram_chat_id
+     * @return unknown
+     */
     public function countTraceTurningByChatId(string $telegram_chat_id) {
         $subscriptions = Subscriptions::where('telegram_chat_id', $telegram_chat_id)
         ->where('goods_trace_type', '=', GoodsTraceType::Turning)
         ->where('expire_at', '>', date('Y-m-d H:i:s'))
         ->count();
+        return $subscriptions;
+    }
+    
+    
+    /**
+     * 取得目前仍在有效期間被訂閱的個股
+     * @param GoodsTraceType $goods_trace_type
+     * @return unknown
+     */
+    public function getAllActiveSubscriptions(GoodsTraceType $goods_trace_type) {
+        $subscriptions = Subscriptions::where('goods_trace_type', $goods_trace_type->value)
+        ->where('expire_at', '>', date('Y-m-d H:i:s'))
+        ->select('goods')
+        ->distinct('goods')
+        ->get();
         return $subscriptions;
     }
     // todo 清除所有過期的訂閱

@@ -66,13 +66,15 @@ class GoodsRealtimePriceService {
 
         // 先取得目前在監控期間的有哪些個股
         // todo 限制數量避免把API打爆
-        // $goods = $obj_subscription->getAllActiveSubscriptions(GoodsTraceType::Turning());
+        $goods = $obj_subscription->getAllActiveSubscriptions(GoodsTraceType::Turning());
 
         // 目前先為了程式開發方便，先直接打API並存成文字檔，做模擬用的API
+        /*
         $goods = [
             '2417', '2498', '2520', '4979', '1785', '1402', '2504', '3711', '2317', '4142',
             '1210', '8926', '1907', '1734', '2356', '2547', '3234', '3231', '2347', '2301',
         ];
+        */
 
         $goods_direction = [];
         foreach($goods as $v) {

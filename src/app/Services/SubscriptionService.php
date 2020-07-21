@@ -137,4 +137,20 @@ class SubscriptionService {
         return $expire_at;
         
     }
+    
+    /**
+     * 取得目前仍在有效期間被訂閱的個股
+     * @param GoodsTraceType $goods_trace_type
+     * @return \App\Repositories\unknown
+     */
+    public function getAllActiveSubscriptions(GoodsTraceType $goods_trace_type) {
+        $obj_subscription = new SubscriptionRepository();
+        $ret = $obj_subscription->getAllActiveSubscriptions($goods_trace_type);
+
+        $goods = [];
+        foreach($ret as $v) {
+            $goods[] = $v->goods;
+        }
+        return $goods;
+    }
 }
