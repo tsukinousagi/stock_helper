@@ -140,11 +140,11 @@ class GoodsRealtimePriceService {
                 $obj_turning->getDirectionText($v4['direction'])
             );
         
-            echo($telegram_message . PHP_EOL);
             $ret = $obj_turning->savePriceDirectionChange($v4['goods'], $v4['direction']);
         }
 
         if ($telegram_message <> '') {
+            echo($telegram_message . PHP_EOL);
             // 發通知
             $ret5 = $obj_telegram->sendMessageViaTelegramBot(env('DEVELOPER_CHATID'), $telegram_message);
         }
