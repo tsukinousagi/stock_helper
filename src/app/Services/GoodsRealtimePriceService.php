@@ -128,16 +128,25 @@ class GoodsRealtimePriceService {
         }
         
         // 寫入轉折記錄
+        $telegram_message = '';
         foreach($goods_direction_changed as $v4) {
-            // todo 發通知
-            $telegram_message = sprintf('%s：%s', 
+
+            if ($telegram_message <> '') {
+                $telegram_message .= PHP_EOL;
+            }
+
+            $telegram_message .= sprintf('%s：%s', 
                 $v4['goods'] . $obj_goods->getGoodsName($v4['goods']), 
                 $obj_turning->getDirectionText($v4['direction'])
             );
-            $ret5 = $obj_telegram->sendMessageViaTelegramBot(env('DEVELOPER_CHATID'), $telegram_message);
         
             echo($telegram_message . PHP_EOL);
             $ret = $obj_turning->savePriceDirectionChange($v4['goods'], $v4['direction']);
+        }
+
+        if ($telegram_message <> '') {
+            // 發通知
+            $ret5 = $obj_telegram->sendMessageViaTelegramBot(env('DEVELOPER_CHATID'), $telegram_message);
         }
         
         /* 
