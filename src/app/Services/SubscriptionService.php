@@ -118,7 +118,7 @@ class SubscriptionService {
         $set_on_next_market_day = false;
         if ($obj_days->isTodayMarketOpen() == true) {
             // 今天是交易日的話，看收盤了沒
-            if (time() > mktime(14, 35, 00)) {
+            if (time() > mktime(13, 35, 00)) {
                 $set_on_next_market_day = true;
             }
         } else {
