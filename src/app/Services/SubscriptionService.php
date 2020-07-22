@@ -24,6 +24,7 @@ class SubscriptionService {
         $obj_goods = new StockGoodsService();
         // 檢查訂閱數量
         $trace_turning_count = $obj_subscription->countTraceTurningByChatId($telegram_chat_id);
+        $trace_turning_count_all = $obj_subscription->countAllTraceTurning($telegram_chat_id);
         $msg = 'blah';
 
         // 先看看這個股在不在
@@ -35,9 +36,11 @@ class SubscriptionService {
             // 先看看訂閱條件在不在
             $ret = $obj_subscription->getSubscription($telegram_chat_id, $goods, $goods_trace_type, $expire_at);
             if (sizeof($ret) <= 0) {
-                if (($telegram_chat_id <> env('DEVELOPER_CHATID')) && ($trace_turning_count >= (int) env('TRACE_TURNING_LIMIT'))) {
+                if (($telegram_chat_id <> env('DEVELOPER_CHATID')) && ($trace_turning_count >= (int) env('TRACE_TURNING_LIMIT_BY_USER'))) {
                     $msg = "抱歉，你的商品追蹤數量已達上限，請刪除不需要的商品。\n";
                     $msg .= $this->getSubscriptionsByChatId($telegram_chat_id);
+                } else if ($trace_turning_count_all >= (int) env('TRACE_TURNING_LIMIT')) {
+                    $msg = "抱歉，全站的商品追蹤數量已達上限。\n";
                 } else {
                     // 新增
                     $ret2 = $obj_subscription->updateSubscription($telegram_chat_id, $goods, $goods_trace_type, $expire_at);

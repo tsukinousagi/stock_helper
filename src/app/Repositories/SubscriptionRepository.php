@@ -88,6 +88,17 @@ class SubscriptionRepository {
         return $subscriptions;
     }
     
+
+    /**
+     * 取得所有人目前訂閱了幾檔個股
+     * @return unknown
+     */
+    public function countAllTraceTurning() {
+        $subscriptions = Subscriptions::where('goods_trace_type', '=', GoodsTraceType::Turning)
+        ->where('expire_at', '>', date('Y-m-d H:i:s'))
+        ->count();
+        return $subscriptions;
+    }
     
     /**
      * 取得目前仍在有效期間被訂閱的個股
