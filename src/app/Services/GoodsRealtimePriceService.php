@@ -2,6 +2,7 @@
 /**
  * 個股即時價量資料
  *
+ * 檢查轉折記錄的SQL SELECT code, d_date, direction FROM `price_direction` WHERE date(d_date) = date(now()) order by code asc, d_date asc;
  */
 namespace App\Services;
 
@@ -120,8 +121,8 @@ class GoodsRealtimePriceService {
             
         }
         
-        $goods_direction_changed = [];
         // 逐一檢查個股是否已出現轉折
+        $goods_direction_changed = [];
         foreach($goods_direction as $v3) {
             $changed = $obj_turning->checkIfDirectionChanged($v3['goods'], $v3['direction']);
             if ($changed) {
@@ -129,10 +130,15 @@ class GoodsRealtimePriceService {
             }
         }
         
+        // 取得每個人訂閱了哪些個股
+        $subscriptions_users = $obj_subscription->getActiveSubscriptionsAndUsers(GoodsTraceType::Turning());
+
         // 寫入轉折記錄
         $telegram_message = '';
+        $telegram_messages = [];
         foreach($goods_direction_changed as $v4) {
-
+            
+            // log訊息
             if ($telegram_message <> '') {
                 $telegram_message .= PHP_EOL;
             }
@@ -141,15 +147,44 @@ class GoodsRealtimePriceService {
                 $v4['goods'] . $obj_goods->getGoodsName($v4['goods']), 
                 $obj_turning->getDirectionText($v4['direction'])
             );
+            
+            // 通知每個訂閱者
+            foreach($subscriptions_users as $k5 => $v5) {
+                if ((string) $k5 == $v4['goods']) {
+                    foreach($v5 as $v6) {
+                        if (!isset($telegram_messages[$v6])) {
+                            $telegram_messages[$v6] = '';
+                        }
+                        if ($telegram_messages[$v6] <> '') {
+                            $telegram_messages[$v6] .= PHP_EOL;
+                        }
+                        $telegram_messages[$v6] .= sprintf('%s：%s', 
+                            $v4['goods'] . $obj_goods->getGoodsName($v4['goods']), 
+                            $obj_turning->getDirectionText($v4['direction'])
+                        );
+                    }
+                }
+            }
         
+            // 寫入資料庫
             $ret = $obj_turning->savePriceDirectionChange($v4['goods'], $v4['direction']);
         }
-
+        
+        // 發通知
+        if (sizeof($telegram_messages) > 0) {
+            foreach($telegram_messages as $k7 => $v7) {
+                echo(sprintf('發給%s:', $k7) . PHP_EOL);
+                echo($v7 . PHP_EOL);
+                $ret5 = $obj_telegram->sendMessageViaTelegramBot($k7, $v7);
+            }
+        }
+        /*
         if ($telegram_message <> '') {
             echo($telegram_message . PHP_EOL);
             // 發通知
             $ret5 = $obj_telegram->sendMessageViaTelegramBot(env('DEVELOPER_CHATID'), $telegram_message);
         }
+        */
         
         /* 
          * 想一下這邊邏輯要怎麼寫....

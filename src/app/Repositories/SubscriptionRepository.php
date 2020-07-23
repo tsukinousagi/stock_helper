@@ -113,5 +113,20 @@ class SubscriptionRepository {
         ->get();
         return $subscriptions;
     }
+    
+    /**
+     * 取得目前仍在有效期間被訂閱的個股，並列出使用者
+     * @param GoodsTraceType $goods_trace_type
+     * @return unknown
+     */
+    public function getActiveSubscriptionsAndUsers(GoodsTraceType $goods_trace_type) {
+        $subscriptions = Subscriptions::where('goods_trace_type', $goods_trace_type->value)
+        ->where('expire_at', '>', date('Y-m-d H:i:s'))
+        ->select('goods', 'telegram_chat_id')
+        ->orderBy('goods', 'asc')
+        ->orderBy('telegram_chat_id', 'asc')
+        ->get();
+        return $subscriptions;
+    }
     // todo 清除所有過期的訂閱
 }

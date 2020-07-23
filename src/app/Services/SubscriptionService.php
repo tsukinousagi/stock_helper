@@ -156,4 +156,23 @@ class SubscriptionService {
         }
         return $goods;
     }
+    
+    /**
+     * 取得目前仍在有效期間被訂閱的個股，並列出使用者
+     * @param GoodsTraceType $goods_trace_type
+     * @return \App\Repositories\unknown
+     */
+    public function getActiveSubscriptionsAndUsers(GoodsTraceType $goods_trace_type) {
+        $obj_subscription = new SubscriptionRepository();
+        $ret = $obj_subscription->getActiveSubscriptionsAndUsers($goods_trace_type);
+
+        $goods = [];
+        foreach($ret as $v) {
+            if (!isset($goods[$v->goods])) {
+                $goods[$v->goods] = [];
+            }
+            $goods[$v->goods][] = $v->telegram_chat_id;
+        }
+        return $goods;
+    }
 }
