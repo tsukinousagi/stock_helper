@@ -36,7 +36,7 @@ class TraceTurningCommand extends Command
         if ($arguments == '') {
             $this->replyWithMessage(
                 [
-                    'text' => "請直接在參數後加上要追蹤的商品代碼，就可以設定股價轉折通知。\n範例： /traceturning 2884",
+                    'text' => "請直接在參數後加上要追蹤的商品代碼，就可以設定股價轉折通知。\n範例： /tt 2884",
                 ]
             );
         } else {
