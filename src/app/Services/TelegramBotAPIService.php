@@ -80,6 +80,9 @@ class TelegramBotAPIService {
 
         $check = false;
         $message = $response['message']['text'];
+        
+        // 移除跳脫字元
+        $message = str_replace('\/', '/', $message);
 
         // 檢查是不是用斜線開頭
         if (substr($message, 0, 1) <> '/') {
