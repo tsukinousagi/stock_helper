@@ -127,7 +127,7 @@ class TelegramBotAPIService {
         ];
         
         foreach ($commands_param as $v) {
-            if ($v == substr($message, 1)) {
+            if ($v == substr($message, 1, strlen($v))) {
                 $check = false;
                 break;
             }
