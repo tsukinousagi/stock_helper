@@ -109,18 +109,26 @@ class TelegramBotAPIService {
     public function checkIsNotBotCommand(string $message) {
         $check = true;
 
-        $commands = [
+        $commands_no_param = [
             'start',
             'tt',
             'sl',
         ];
         
-        foreach ($commands as $v) {
-            if ($v == substr($message, 1, strlen($v))) {
-                // 如果剛好是無參數的指令則略過
-                if (in_array($message, ['/tt'])) {
-                    $check = true;
-                } else {
+        foreach ($commands_no_param as $v) {
+            if ($v == substr($message, 1)) {
+                $check = false;
+                break;
+            }
+        }
+        
+        if (!$check) {
+            $commands_param = [
+                'tt ',
+            ];
+            
+            foreach ($commands_param as $v) {
+                if ($v == substr($message, 1)) {
                     $check = false;
                     break;
                 }
