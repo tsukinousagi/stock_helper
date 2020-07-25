@@ -122,16 +122,14 @@ class TelegramBotAPIService {
             }
         }
         
-        if (!$check) {
-            $commands_param = [
-                'tt ',
-            ];
-            
-            foreach ($commands_param as $v) {
-                if ($v == substr($message, 1)) {
-                    $check = false;
-                    break;
-                }
+        $commands_param = [
+            'tt ',
+        ];
+        
+        foreach ($commands_param as $v) {
+            if ($v == substr($message, 1)) {
+                $check = false;
+                break;
             }
         }
         
