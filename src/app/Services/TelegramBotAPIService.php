@@ -18,7 +18,9 @@ class TelegramBotAPIService {
         $response = Telegram::commandsHandler(false, ['timeout' => 30]);
         echo(json_encode($response) . PHP_EOL);
         
-        $this->replyIfNotCommand($response);
+        foreach($response as $v) {
+            $this->replyIfNotCommand($v);
+        }
 
         // 發送訊息
         /*
@@ -75,28 +77,26 @@ class TelegramBotAPIService {
      * @return boolean
      */
     public function replyIfNotCommand($response) {
-        foreach($response as $v) {
 
-            $check = false;
-            $message = $v['message']['text'];
+        $check = false;
+        $message = $response['message']['text'];
 
-            // 檢查是不是用斜線開頭
-            if (substr($message, 0, 1) <> '/') {
-                $check = true;
-            }
-
-            // 檢查是不是有效指令
-            if (!$check) {
-                $check = $this->checkIsNotBotCommand($message);
-            }
-
-            // 發訊息回應
-            if ($check) {
-                $chatid = $v['message']['chat']['id'];
-                $ret = $this->sendMessageViaTelegramBot($chatid, '輸入錯誤，請使用 /start 指令觀看說明');
-            }
+        // 檢查是不是用斜線開頭
+        if (substr($message, 0, 1) <> '/') {
+            $check = true;
         }
-        return true;
+
+        // 檢查是不是有效指令
+        if (!$check) {
+            $check = $this->checkIsNotBotCommand($message);
+        }
+
+        // 發訊息回應
+        if ($check) {
+            $chatid = $response['message']['chat']['id'];
+            $ret = $this->sendMessageViaTelegramBot($chatid, '輸入錯誤，請使用 /start 指令觀看說明');
+        }
+        return $ret;
     }
     
     /**
