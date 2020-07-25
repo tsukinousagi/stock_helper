@@ -81,21 +81,18 @@ class TelegramBotAPIService {
         $check = false;
         $message = $response['message']['text'];
         
-        // 移除跳脫字元
-        $message = str_replace('\/', '/', $message);
-
         // 檢查是不是用斜線開頭
         if (substr($message, 0, 1) <> '/') {
             $check = true;
         }
 
         // 檢查是不是有效指令
-        if (!$check) {
+        if ($check) {
             $check = $this->checkIsNotBotCommand($message);
         }
 
         // 發訊息回應
-        if ($check) {
+        if (!$check) {
             $chatid = $response['message']['chat']['id'];
             $ret = $this->sendMessageViaTelegramBot($chatid, '輸入錯誤，請使用 /start 指令觀看說明');
         }
