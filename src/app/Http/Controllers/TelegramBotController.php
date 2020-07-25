@@ -20,11 +20,13 @@ class TelegramBotController extends Controller
      * @return string
      */
     public function webhook(Request $request) {
+        $obj_telegram = new TelegramBotAPIService();
         Log::info(__CLASS__ . ':' . __FUNCTION__);
 //        $updates = Telegram::getWebhookUpdates();
 //        Log::info($updates);
         $response = Telegram::commandsHandler(true);
         Log::info($response);
+        $ret = $obj_telegram->replyIfNotCommand($response);
         return 'ok';
     }
     
