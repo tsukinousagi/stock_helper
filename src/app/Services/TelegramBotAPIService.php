@@ -92,6 +92,7 @@ class TelegramBotAPIService {
         }
 
 
+        $ret = true;
         // 發訊息回應
         if ($check) {
             $chatid = $response['message']['chat']['id'];
@@ -106,7 +107,7 @@ class TelegramBotAPIService {
      * @return boolean
      */
     public function checkIsNotBotCommand(string $message) {
-        $check = false;
+        $check = true;
 
         $commands = [
             'start',
@@ -118,9 +119,9 @@ class TelegramBotAPIService {
             if ($v == substr($message, 1, strlen($v))) {
                 // 如果剛好是無參數的指令則略過
                 if (in_array($message, ['/tt'])) {
-                    $check = false;
-                } else {
                     $check = true;
+                } else {
+                    $check = false;
                     break;
                 }
             }
