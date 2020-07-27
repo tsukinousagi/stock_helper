@@ -140,7 +140,7 @@ class MarketDaysService {
      */
     public function isCurrentlyMarketClosed() {
         if ($this->isTodayMarketOpen()) {
-            if (time() < mktime(14, 35, 00)) {
+            if (time() < mktime(13, 35, 00)) {
                 return false;
             } else {
                 return true;

@@ -132,7 +132,7 @@ class SubscriptionService {
         // 設定到期日為今天收盤，或下一個交易日收盤
         if ($set_on_next_market_day) {
             $expire_at = $obj_days->calculateMarketDays(date('Ymd'), '+', 1);
-            $expire_at = substr($expire_at, 0, 4) . '-' . substr($expire_at, 4, 2) . '-' . substr($expire_at, 6, 2) . ' 14:35:00';
+            $expire_at = substr($expire_at, 0, 4) . '-' . substr($expire_at, 4, 2) . '-' . substr($expire_at, 6, 2) . ' 13:35:00';
         } else {
             $expire_at = date('Y-m-d') . ' 13:35:00';
         }
