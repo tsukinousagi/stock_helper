@@ -10,11 +10,11 @@ use Exception;
 
 
 class MarketDaysService {
-    
+
     public function isTodayMarketOpen() {
         return $this->isMarketOpen(date('Ymd'));
     }
-    
+
     /**
      * 查詢是否為交易日
      * @param string $d_date
@@ -56,18 +56,44 @@ class MarketDaysService {
                     '1002',
                     '1009',
                     '1010',
-                    
+
                 ])) {
                     return false;
-                    
+
+                } else {
+                    return true;
+                }
+            } else if ($d_year == '2021') {
+                if (in_array($d_month . $d_day, [
+                    '0101',
+                    '0208',
+                    '0209',
+                    '0210',
+                    '0211',
+                    '0212',
+                    '0215',
+                    '0216',
+                    '0301',
+                    '0402',
+                    '0405',
+                    '0430',
+                    '0614',
+                    '0920',
+                    '0921',
+                    '1011',
+                    '1231',
+
+                ])) {
+                    return false;
+
                 } else {
                     return true;
                 }
             }
         }
-        
+
     }
-    
+
     /**
      * 往前或往後推算交易日
      * @param string $d_date
@@ -86,7 +112,7 @@ class MarketDaysService {
         }
         return $new_date;
     }
-    
+
     /**
      * 取得該月最後一個交易日
      * @param string $d_date
@@ -101,11 +127,11 @@ class MarketDaysService {
         while($this->isMarketOpen($new_date) == false) {
             $new_date = $this->calculateDay($new_date, '-');
         }
-        
+
         return $new_date;
     }
-    
-    
+
+
     /**
      * 加減一天，不考慮交易日
      * @param string $d_date
@@ -117,10 +143,10 @@ class MarketDaysService {
         $d_year = substr($d_date, 0, 4);
         $d_month = substr($d_date, 4, 2);
         $d_day = substr($d_date, 6, 2);
-        
+
         // 算timestamp
         $ts = mktime(0, 0, 0, $d_month, $d_day, $d_year);
-        
+
         // 加減
         if ($direction == '+') {
             $ts += 86400;
@@ -129,11 +155,11 @@ class MarketDaysService {
         } else {
             return false;
         }
-        
+
         // 組回日期
         return date('Ymd', $ts);
     }
-    
+
     /**
      * 收盤了沒？
      * @return boolean
