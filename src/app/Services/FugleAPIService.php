@@ -25,7 +25,7 @@ class FugleAPIService {
      */
     public function getRealtimeChartData(string $goods) {
         // api 參數處理
-        $api_url = 'https://api.fugle.tw/realtime/v0/intraday/chart?symbolId=%s&apiToken=%s';
+        $api_url = 'https://api.fugle.tw/realtime/v0.2/intraday/chart?symbolId=%s&apiToken=%s';
         $api_url = sprintf($api_url, $goods, env('FUGLE_API_TOKEN', ''));
         
         // 打api
