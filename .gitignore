@@ -7,3 +7,4 @@ src/.editorconfig
 src/.gitattributes
 src/.project
 src/.settings/org.eclipse.wst.validation.prefs
+.DS_Store

@@ -1,4 +1,4 @@
-FROM php:apache
+FROM php:7.2-apache
 
 # basic php extensions
 RUN apt-get update && apt-get -y install libmcrypt-dev libgd-dev libonig-dev && docker-php-ext-install -j$(nproc) iconv mysqli mbstring opcache pdo pdo_mysql gd
