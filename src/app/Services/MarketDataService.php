@@ -7,6 +7,7 @@ namespace App\Services;
 use Log;
 use Exception;
 use App\Services\RemoteUrlService;
+use App\Services\MarketDaysService;
 use PHPHtmlParser\Dom;
 
 
@@ -18,26 +19,33 @@ class MarketDataService {
      */
     public function getAndFormatMarketData(string $type = '') {
         $obj_remote_url = new RemoteUrlService();
+        $obj_market_days = new MarketDaysService();
         if ($type == 'tse_market_close') {
-            // 收盤後取得加權指數等統計資料
-            $url_tse_index = 'https://mis.twse.com.tw/stock/data/mis_ohlc_WWW.txt?_=' . time();
-            $ret = $obj_remote_url->getUrl($url_tse_index, 600);
-            $ret_decoded = json_decode($ret);
-            
-            // 加權指數
-            $tse = $ret_decoded->infoArray[0]->z;
-            // 前一天的加權指數
-            $tse_last = $ret_decoded->infoArray[0]->y;
-            // 成交量
-            $volume = $ret_decoded->infoArray[0]->v;
-            
-            // 整理出字串
-            $str_tse_index = $this->formatTseIndexInfo($tse, $tse_last, $volume);
-            if ($str_tse_index == '') {
-                Log::error('加權指數資料有誤');
-                Log::error('URL: ' . $url_tse_index);
+            if ($obj_market_days->isTodayMarketOpen()) {
+                // 收盤後取得加權指數等統計資料
+                $url_tse_index = 'https://mis.twse.com.tw/stock/data/mis_ohlc_WWW.txt?_=' . time();
+                $ret = $obj_remote_url->getUrl($url_tse_index, 600);
+                $ret_decoded = json_decode($ret);
+                
+                // 加權指數
+                $tse = $ret_decoded->infoArray[0]->z;
+                // 前一天的加權指數
+                $tse_last = $ret_decoded->infoArray[0]->y;
+                // 成交量
+                $volume = $ret_decoded->infoArray[0]->v;
+                
+                // 整理出字串
+                $str_tse_index = $this->formatTseIndexInfo($tse, $tse_last, $volume);
+                if ($str_tse_index == '') {
+                    Log::error('加權指數資料有誤');
+                    Log::error('URL: ' . $url_tse_index);
+                return '';
+                } else {
+                    return $str_tse_index;
+                }
             } else {
-                return $str_tse_index;
+                Log::error('今天不是交易日');
+                return '';
             }
             
         }
