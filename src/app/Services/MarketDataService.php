@@ -81,6 +81,55 @@ class MarketDataService {
                 Log::error('今天不是交易日');
                 return '';
             }
+        } else if ($type == 'us_index') {
+            // php artisan command:plurkpost us_index
+            if ($obj_market_days->isTodayMarketOpen()) {
+                /**
+                 * 四大指數資料
+                 *        道瓊工業 那斯達克 標普500 費城半導體
+                 * 指數
+                 * 漲跌
+                 * 百分比
+                 */
+                $index_data = [];
+                $sub_dow = [];
+                $sub_nasdaq = [];
+                $sub_sp = [];
+                $sub_phlx = [];
+
+                // 美股四大指數資料
+                $url_us_index = 'https://ws.api.cnyes.com/ws/api/v2/universal/quote?type=USINDEX&column=A&page=0&limit=50';
+                $ret = $obj_remote_url->getUrl($url_us_index, 300);
+                $ret_decoded = json_decode($ret, true);
+                
+                foreach($ret_decoded['data']['items'] as $v) {
+
+                    if ($v['200009'] == '道瓊指數') {
+                        $sub_dow = [$v['200009'], $v['6'], $v['11'], $v['56']];
+                    } else if ($v['200009'] == 'NASDAQ') {
+                        $sub_nasdaq = [$v['200009'], $v['6'], $v['11'], $v['56']];
+                    } else if ($v['200009'] == 'S&P 500') {
+                        $sub_sp = [$v['200009'], $v['6'], $v['11'], $v['56']];
+                    } else if ($v['200009'] == '費城半導體') {
+                        $sub_phlx = [$v['200009'], $v['6'], $v['11'], $v['56']];
+                    }
+                }
+                
+                $index_data = [$sub_dow, $sub_nasdaq, $sub_sp, $sub_phlx];
+
+                // 整理出字串
+                $str_us_index_exchange = $this->formatUSIndexInfo($index_data);
+                if ($str_us_index_exchange == '') {
+                    Log::error('美股四大指數買賣超資料有誤');
+                    Log::error('URL: ' . $url_us_index);
+                return '';
+                } else {
+                    return $str_us_index_exchange;
+                }
+            } else {
+                Log::error('今天不是交易日');
+                return '';
+            }
         }
     }
     
@@ -98,12 +147,9 @@ class MarketDataService {
             $difference = $tse - $tse_last;
             $percent = $difference / $tse_last * 100;
             $volume = $volume / 100;
+
             // 漲跌文字
-            if ($difference > 0) {
-                $updown = '△漲';
-            } else {
-                $updown = '▼跌';
-            }
+            $updown = $this->UpDownIconText($difference);
             
             // 文字模版
             $tse_index_format = '%d/%d/%d 加權指數 %.2f %s %.2f （%.2f%%）成交量：%.2f 億';
@@ -154,6 +200,27 @@ class MarketDataService {
     }
     
     /**
+     * 美化美股四大指數資料
+     * @param unknown $index_data
+     */
+    private function formatUSIndexInfo($index_data) {
+        $line_break = PHP_EOL;
+        $us_index_string = '美股四大指數';
+        foreach ($index_data as $v) {
+            $us_index_string .= $line_break;
+            $row = sprintf('%s %.2f %s %.2f （%.2f%%）',
+                $v[0],
+                $v[1],
+                $this->UpDownIconText($v[2]),
+                $v[2],
+                $v[3]);
+            $us_index_string .= $row;
+        }
+        return $us_index_string;
+        
+    }
+    
+    /**
      * 去除數字逗號
      * @param string $num
      */
@@ -170,6 +237,18 @@ class MarketDataService {
             return '買超';
         } else {
             return '賣超';
+        }
+    }
+    
+    /**
+     * 漲跌文字
+     * @param unknown $amount
+     */
+    private function UpDownIconText($amount) {
+        if ($amount > 0) {
+            return '△漲';
+        } else {
+            return '▼跌';
         }
     }
 

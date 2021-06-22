@@ -35,7 +35,7 @@ class RemoteUrlService {
             Log::info('cache miss');
             // 沒有，打URL
             $response = $this->waitForGetUrl($url);
-            Cache::put($cache_key, $response, $ttl);
+            Cache::put($cache_key, (string) $response, $ttl);
         } else {
             Log::info('cache hit');
         }
