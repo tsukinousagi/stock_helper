@@ -205,7 +205,7 @@ class MarketDataService {
      */
     private function formatUSIndexInfo($index_data) {
         $line_break = PHP_EOL;
-        $us_index_string = '美股四大指數';
+        $us_index_string = sprintf('%d/%d/%d 美股四大指數', date('Y'), date('m'), date('d'));
         foreach ($index_data as $v) {
             $us_index_string .= $line_break;
             $row = sprintf('%s %.2f %s %.2f （%.2f%%）',
