@@ -20,9 +20,6 @@ class MarketDataService {
     public function getAndFormatMarketData(string $type = '') {
         $obj_remote_url = new RemoteUrlService();
         $obj_market_days = new MarketDaysService();
-        // todo
-        // 美股四大指數
-        // 外幣匯率
         if ($type == 'tse_market_close') {
             // php artisan command:plurkpost tse_market_close
             if ($obj_market_days->isTodayMarketOpen()) {
@@ -120,15 +117,81 @@ class MarketDataService {
                 // 整理出字串
                 $str_us_index_exchange = $this->formatUSIndexInfo($index_data);
                 if ($str_us_index_exchange == '') {
-                    Log::error('美股四大指數買賣超資料有誤');
+                    Log::error('美股四大指數資料有誤');
                     Log::error('URL: ' . $url_us_index);
-                return '';
+                    return '';
                 } else {
                     return $str_us_index_exchange;
                 }
             } else {
                 Log::error('今天不是交易日');
                 return '';
+            }
+        } else if ($type == 'exchange_rate') {
+            // php artisan command:plurkpost exchange_rate
+            /**
+             * 匯率資料
+             */
+            $data_exchange_rate = [
+                'USD' => [],
+                'CNY' => [],
+                'HKD' => [],
+                'JPY' => [],
+                'EUR' => [],
+            ];
+
+            // 取得匯率資料
+            $url_exchange_rate = 'https://tw.rter.info/capi.php';
+            $ret = $obj_remote_url->getUrl($url_exchange_rate, 3600);
+            $ret_decoded = json_decode($ret, true);
+            
+            foreach($data_exchange_rate as $k => $v) {
+                if ($k == 'USD') {
+                    // 美元就直接取
+                    $data_exchange_rate['USD'] = [
+                        'caption' => '美元',
+                        'code' => 'USD',
+                        'rate' => sprintf('%.2f', $ret_decoded['USDTWD']['Exrate']),
+                    ];
+                } else if ($k == 'CNY') {
+                    // 人民幣
+                    $data_exchange_rate['CNY'] = [
+                        'caption' => '人民幣',
+                        'code' => 'CNY',
+                        'rate' => sprintf('%.3f', ($ret_decoded['USDTWD']['Exrate'] / $ret_decoded['USDCNY']['Exrate'])),
+                    ];
+                } else if ($k == 'HKD') {
+                    // 港幣
+                    $data_exchange_rate['HKD'] = [
+                        'caption' => '港幣',
+                        'code' => 'HKD',
+                        'rate' => sprintf('%.3f', ($ret_decoded['USDTWD']['Exrate'] / $ret_decoded['USDHKD']['Exrate'])),
+                    ];
+                } else if ($k == 'JPY') {
+                    // 日圓
+                    $data_exchange_rate['JPY'] = [
+                        'caption' => '日圓',
+                        'code' => 'JPY',
+                        'rate' => sprintf('%.4f', ($ret_decoded['USDTWD']['Exrate'] / $ret_decoded['USDJPY']['Exrate'])),
+                    ];
+                } else if ($k == 'EUR') {
+                    // 歐元
+                    $data_exchange_rate['EUR'] = [
+                        'caption' => '歐元',
+                        'code' => 'EUR',
+                        'rate' => sprintf('%.3f', ($ret_decoded['USDTWD']['Exrate'] / $ret_decoded['USDEUR']['Exrate'])),
+                    ];
+                }
+            }
+            
+            // 整理出字串
+            $str_exchange_rate = $this->formatExchangeRateInfo($data_exchange_rate);
+            if ($str_exchange_rate == '') {
+                Log::error('匯率資料有誤');
+                Log::error('URL: ' . $url_exchange_rate);
+                return '';
+            } else {
+                return $str_exchange_rate;
             }
         }
     }
@@ -221,6 +284,25 @@ class MarketDataService {
     }
     
     /**
+     * 美化匯率資料
+     * @param unknown $exchange_rate
+     * @return string
+     */
+    private function formatExchangeRateInfo($exchange_rate) {
+        $line_break = PHP_EOL;
+        $exchange_rate_string = sprintf('%d/%d/%d 全球主要貨幣匯率', date('Y'), date('m'), date('d'));
+        foreach ($exchange_rate as $v) {
+            $exchange_rate_string .= $line_break;
+            $row = sprintf('%s(%s) %s', $v['caption'], $v['code'] ,$v['rate']);
+            $exchange_rate_string .= $row;
+        }
+        $exchange_rate_string .= $line_break;
+        $exchange_rate_string .= '註：以上為該幣別兌新台幣的數值';
+        return $exchange_rate_string;
+        
+    }
+    
+    /**
      * 去除數字逗號
      * @param string $num
      */
@@ -246,9 +328,9 @@ class MarketDataService {
      */
     private function UpDownIconText($amount) {
         if ($amount > 0) {
-            return '△漲';
+            return '△';
         } else {
-            return '▼跌';
+            return '▼';
         }
     }
 
