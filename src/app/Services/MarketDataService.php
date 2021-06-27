@@ -179,7 +179,7 @@ class MarketDataService {
                     $data_exchange_rate['EUR'] = [
                         'caption' => '歐元',
                         'code' => 'EUR',
-                        'rate' => sprintf('%.3f', ($ret_decoded['USDTWD']['Exrate'] / $ret_decoded['USDEUR']['Exrate'])),
+                        'rate' => sprintf('%.2f', ($ret_decoded['USDTWD']['Exrate'] / $ret_decoded['USDEUR']['Exrate'])),
                     ];
                 }
             }

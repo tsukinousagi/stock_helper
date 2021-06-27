@@ -7,6 +7,7 @@ namespace App\Services;
 
 use Log;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use App\Services\MarketDataService;
 
 
@@ -17,14 +18,22 @@ class PlurkPostService {
      * @param string $type
      */
     public function makePlurk(string $type = '') {
-        $obj_market_data = new MarketDataService();
-        $ret = $obj_market_data->getAndFormatMarketData($type);
-        // 不是空字串就發噗
-        if ($ret <> '') {
-            echo($ret . PHP_EOL);
-            $this->postPlurk('shares', $ret);
+        $check_key = date('Ymd') . $type;
+        if (Cache::get($check_key) == false) { // 偵測是否發過相同的噗
+            $obj_market_data = new MarketDataService();
+            $ret = $obj_market_data->getAndFormatMarketData($type);
+            // 不是空字串就發噗
+            // todo 研究如何回覆自己的噗，之後考慮附加一些資訊
+            if ($ret <> '') {
+                echo($ret . PHP_EOL);
+                $this->postPlurk('shares', $ret);
+                // 寫入檢查用cache
+                Cache::put($check_key, rand(0, 9999), 1800);
+            } else {
+                echo('取得資料發生錯誤' . PHP_EOL);
+            }
         } else {
-            echo('取得資料發生錯誤' . PHP_EOL);
+            echo('相同的噗之前發過了' . PHP_EOL);
         }
     }
 
