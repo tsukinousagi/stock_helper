@@ -25,7 +25,7 @@ class MarketDataService {
             if ($obj_market_days->isTodayMarketOpen()) {
                 // 收盤後取得加權指數等統計資料
                 $url_tse_index = 'https://mis.twse.com.tw/stock/data/mis_ohlc_WWW.txt?_=' . time();
-                $ret = $obj_remote_url->getUrl($url_tse_index, 600);
+                $ret = $obj_remote_url->getUrl($url_tse_index, 300);
                 $ret_decoded = json_decode($ret);
                 
                 // 加權指數
@@ -58,7 +58,7 @@ class MarketDataService {
 
                 // 收盤後取得三大法人買賣超統計
                 $url_juridical = 'https://www.twse.com.tw/fund/BFI82U?response=json&dayDate=&weekDate=&monthDate=&type=day&_=' . time();
-                $ret = $obj_remote_url->getUrl($url_juridical, 3600);
+                $ret = $obj_remote_url->getUrl($url_juridical, 300);
                 $ret_decoded = json_decode($ret);
 
                 $amount_foreign = $this->removeNumberComma($ret_decoded->data[3][3]);
@@ -142,7 +142,7 @@ class MarketDataService {
 
             // 取得匯率資料
             $url_exchange_rate = 'https://tw.rter.info/capi.php';
-            $ret = $obj_remote_url->getUrl($url_exchange_rate, 3600);
+            $ret = $obj_remote_url->getUrl($url_exchange_rate, 300);
             $ret_decoded = json_decode($ret, true);
             
             foreach($data_exchange_rate as $k => $v) {
