@@ -40,9 +40,9 @@ class MarketDataService {
                 if ($str_tse_index == '') {
                     Log::error('加權指數資料有誤');
                     Log::error('URL: ' . $url_tse_index);
-                return '';
+                    return [''];
                 } else {
-                    return $str_tse_index;
+                    return [$str_tse_index];
                 }
             } else {
                 Log::error('今天不是交易日');
@@ -70,9 +70,9 @@ class MarketDataService {
                 if ($str_juridical_exchange == '') {
                     Log::error('三大法人買賣超資料有誤');
                     Log::error('URL: ' . $url_juridical);
-                return '';
+                    return [''];
                 } else {
-                    return $str_juridical_exchange;
+                    return [$str_juridical_exchange];
                 }
             } else {
                 Log::error('今天不是交易日');
@@ -119,9 +119,9 @@ class MarketDataService {
                 if ($str_us_index_exchange == '') {
                     Log::error('美股四大指數資料有誤');
                     Log::error('URL: ' . $url_us_index);
-                    return '';
+                    return [''];
                 } else {
-                    return $str_us_index_exchange;
+                    return [$str_us_index_exchange];
                 }
             } else {
                 Log::error('今天不是交易日');
@@ -189,9 +189,9 @@ class MarketDataService {
             if ($str_exchange_rate == '') {
                 Log::error('匯率資料有誤');
                 Log::error('URL: ' . $url_exchange_rate);
-                return '';
+                return [''];
             } else {
-                return $str_exchange_rate;
+                return [$str_exchange_rate];
             }
         }
     }

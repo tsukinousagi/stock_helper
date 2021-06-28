@@ -24,8 +24,8 @@ class PlurkPostService {
             $ret = $obj_market_data->getAndFormatMarketData($type);
             // 不是空字串就發噗
             // todo 研究如何回覆自己的噗，之後考慮附加一些資訊
-            if ($ret <> '') {
-                echo($ret . PHP_EOL);
+            if ((isset($ret[0])) && ($ret[0] <> '')) {
+                echo($ret[0] . PHP_EOL);
                 $this->postPlurk('shares', $ret);
                 // 寫入檢查用cache
                 Cache::put($check_key, rand(0, 9999), 1800);
