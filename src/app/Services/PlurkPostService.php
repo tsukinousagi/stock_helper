@@ -26,7 +26,7 @@ class PlurkPostService {
             // todo 研究如何回覆自己的噗，之後考慮附加一些資訊
             if ((isset($ret[0])) && ($ret[0] <> '')) {
                 echo($ret[0] . PHP_EOL);
-                $this->postPlurk('shares', $ret);
+                $this->postPlurk('shares', $ret[0]);
                 // 寫入檢查用cache
                 Cache::put($check_key, rand(0, 9999), 1800);
             } else {
