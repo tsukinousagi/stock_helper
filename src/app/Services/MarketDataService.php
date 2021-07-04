@@ -8,6 +8,7 @@ use Log;
 use Exception;
 use App\Services\RemoteUrlService;
 use App\Services\MarketDaysService;
+use App\Services\FinanceTopicsService;
 use PHPHtmlParser\Dom;
 
 
@@ -193,6 +194,17 @@ class MarketDataService {
             } else {
                 return [$str_exchange_rate];
             }
+        } else if ($type == 'finance_topics') {
+            $obj_topic = new FinanceTopicsService();
+            $topic_data = $obj_topic->getRandomTopics()->toArray();
+            $str_topic_data = $this->formatTopicData($topic_data);
+            if ($str_topic_data == '') {
+                Log::error('金融話題資料有誤');
+                return [''];
+            } else {
+                return [$str_topic_data];
+            }
+            
         }
     }
     
@@ -300,6 +312,16 @@ class MarketDataService {
         $exchange_rate_string .= '註：以上為該幣別兌新台幣的數值';
         return $exchange_rate_string;
         
+    }
+    
+    /**
+     * 美化金融話題資料
+     * @param unknown $topic_data
+     */
+    private function formatTopicData($topic_data) {
+        $line_break = PHP_EOL;
+        $str = '#' . $topic_data['topic'] . $line_break . $line_break . $topic_data['content'];
+        return $str;
     }
     
     /**
