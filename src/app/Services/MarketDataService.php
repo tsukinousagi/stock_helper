@@ -52,12 +52,12 @@ class MarketDataService {
         } else if ($type == 'juridical_exchange') {
             // php artisan command:plurkpost juridical_exchange
             if ($obj_market_days->isTodayMarketOpen()) {
-                // 外資、投信、自營
+                // 台股外資、投信、自營
                 $amount_foreign = 0;
                 $amount_fund = 0;
                 $amount_self = 0;
 
-                // 收盤後取得三大法人買賣超統計
+                // 收盤後取得台股三大法人買賣超統計
                 $url_juridical = 'https://www.twse.com.tw/fund/BFI82U?response=json&dayDate=&weekDate=&monthDate=&type=day&_=' . time();
                 $ret = $obj_remote_url->getUrl($url_juridical, 300);
                 $ret_decoded = json_decode($ret);
@@ -65,9 +65,19 @@ class MarketDataService {
                 $amount_foreign = $this->removeNumberComma($ret_decoded->data[3][3]);
                 $amount_fund = $this->removeNumberComma($ret_decoded->data[2][3]);
                 $amount_self = $this->removeNumberComma($ret_decoded->data[0][3]) + $this->removeNumberComma($ret_decoded->data[1][3]);
+                
+                // 台指期未平倉
+                $url_futures = 'https://www.taifex.com.tw/cht/3/futContractsDate';
+                $ret = $obj_remote_url->getUrl($url_futures, 300);
+                $dom = new Dom;
+                $dom->load($ret);
+                $table = $dom->find('div[id="printhere"]')->find('div')[3]->find('table')->find('tbody')->find('tr')[1]->find('td')->find('table')->find('tbody');
+                $futures_self = trim($table->find('tr')[3]->find('td')[10]->find('div')->find('font')->text);
+                $futures_fund = trim($table->find('tr')[4]->find('td')[10]->find('div')->find('font')->text);
+                $futures_foreign = trim($table->find('tr')[5]->find('td')[10]->find('div')->find('font')->text);
 
                 // 整理出字串
-                $str_juridical_exchange = $this->formatJuridicalExchangeInfo($amount_foreign, $amount_fund, $amount_self);
+                $str_juridical_exchange = $this->formatJuridicalExchangeInfo($amount_foreign, $amount_fund, $amount_self, $futures_foreign, $futures_fund, $futures_self);
                 if ($str_juridical_exchange == '') {
                     Log::error('三大法人買賣超資料有誤');
                     Log::error('URL: ' . $url_juridical);
@@ -243,10 +253,15 @@ class MarketDataService {
      * @param unknown $self
      * @return string
      */
-    private function formatJuridicalExchangeInfo($foreign, $fund, $self) {
+    private function formatJuridicalExchangeInfo($foreign, $fund, $self, $futures_foreign, $futures_fund, $futures_self) {
+        $line_break = PHP_EOL;
         if (is_numeric($foreign) &&
             is_numeric($fund) &&
-            is_numeric($self)) {
+            is_numeric($self) &&
+            is_numeric(str_replace(',', '', $futures_foreign)) &&
+            is_numeric(str_replace(',', '', $futures_fund)) &&
+            is_numeric(str_replace(',', '', $futures_self))
+            ) {
             
             // 四捨五入到億元
             $foreign_billion = round($foreign / 100000000);
@@ -254,7 +269,7 @@ class MarketDataService {
             $self_billion = round($self / 100000000);
             
             // 文字模版
-            $juridical_exchange_format = '%d/%d/%d 三大法人動向 外資%s %d 億 投信%s %d 億 自營商%s %d 億 ';
+            $juridical_exchange_format = '%d/%d/%d 台股三大法人動向 外資%s %d 億 投信%s %d 億 自營商%s %d 億 ' . $line_break . '台股指數期貨未平倉口數 外資 %s 口 投信 %s 口 自營商 %s 口';
             $juridical_exchange_string = sprintf(
                 $juridical_exchange_format, 
                 date('Y'), 
@@ -265,7 +280,10 @@ class MarketDataService {
                 $this->buySellText($fund),
                 abs($fund_billion),
                 $this->buySellText($self),
-                abs($self_billion)
+                abs($self_billion),
+                $futures_foreign,
+                $futures_fund,
+                $futures_self
                 );
             return $juridical_exchange_string;
         } else {
