@@ -89,6 +89,32 @@ class MarketDaysService {
                 } else {
                     return true;
                 }
+            } else if ($d_year == '2022') {
+                if (in_array($d_month . $d_day, [
+                    '0101',
+                    '0127',
+                    '0128',
+                    '0131',
+                    '0201',
+                    '0202',
+                    '0203',
+                    '0204',
+                    '0228',
+                    '0404',
+                    '0405',
+                    '0501',
+                    '0502',
+                    '0603',
+                    '0909',
+                    '0910',
+                    '1010',
+
+                ])) {
+                    return false;
+
+                } else {
+                    return true;
+                }
             }
         }
 
