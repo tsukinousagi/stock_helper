@@ -28,22 +28,39 @@ class MarketDataService {
                 $url_tse_index = 'https://mis.twse.com.tw/stock/data/mis_ohlc_WWW.txt?_=' . time();
                 $ret = $obj_remote_url->getUrl($url_tse_index, 300);
                 $ret_decoded = json_decode($ret);
-                
+
                 // 加權指數
                 $tse = $ret_decoded->infoArray[0]->z;
                 // 前一天的加權指數
                 $tse_last = $ret_decoded->infoArray[0]->y;
                 // 成交量
                 $volume = $ret_decoded->infoArray[0]->v;
-                
+
                 // 整理出字串
                 $str_tse_index = $this->formatTseIndexInfo($tse, $tse_last, $volume);
-                if ($str_tse_index == '') {
+
+                // 收盤後取得櫃買指數等統計資料
+                $url_otc_index = 'https://www.tpex.org.tw/web/inc/chart_json.php?f=0&_=' . time();
+                $ret = $obj_remote_url->getUrl($url_otc_index, 300);
+                $ret_decoded = json_decode($ret);
+
+                // 櫃買指數
+                $otc = $ret_decoded->finalPoint;
+                // 前一天的櫃買指數
+                $otc_last = $ret_decoded->startPoint;
+                // 成交量
+                $volume = $ret_decoded->totalVoulmn;
+
+                // 整理出字串
+                $str_otc_index = $this->formatOtcIndexInfo($otc, $otc_last, $volume);
+
+                if (($str_tse_index == '') || ($str_otc_index == '')) {
                     Log::error('加權指數資料有誤');
                     Log::error('URL: ' . $url_tse_index);
+                    Log::error('URL: ' . $url_otc_index);
                     return [''];
                 } else {
-                    return [$str_tse_index];
+                    return [$str_tse_index . PHP_EOL . $str_otc_index];
                 }
             } else {
                 Log::error('今天不是交易日');
@@ -65,7 +82,7 @@ class MarketDataService {
                 $amount_foreign = $this->removeNumberComma($ret_decoded->data[3][3]);
                 $amount_fund = $this->removeNumberComma($ret_decoded->data[2][3]);
                 $amount_self = $this->removeNumberComma($ret_decoded->data[0][3]) + $this->removeNumberComma($ret_decoded->data[1][3]);
-                
+
                 // 台指期未平倉
                 $url_futures = 'https://www.taifex.com.tw/cht/3/futContractsDate';
                 $ret = $obj_remote_url->getUrl($url_futures, 300);
@@ -109,7 +126,7 @@ class MarketDataService {
                 $url_us_index = 'https://ws.api.cnyes.com/ws/api/v2/universal/quote?type=USINDEX&column=A&page=0&limit=50';
                 $ret = $obj_remote_url->getUrl($url_us_index, 300);
                 $ret_decoded = json_decode($ret, true);
-                
+
                 foreach($ret_decoded['data']['items'] as $v) {
 
                     if ($v['200009'] == '道瓊指數') {
@@ -122,7 +139,7 @@ class MarketDataService {
                         $sub_phlx = [$v['200009'], $v['6'], $v['11'], $v['56']];
                     }
                 }
-                
+
                 $index_data = [$sub_dow, $sub_nasdaq, $sub_sp, $sub_phlx];
 
                 // 整理出字串
@@ -155,7 +172,7 @@ class MarketDataService {
             $url_exchange_rate = 'https://tw.rter.info/capi.php';
             $ret = $obj_remote_url->getUrl($url_exchange_rate, 300);
             $ret_decoded = json_decode($ret, true);
-            
+
             foreach($data_exchange_rate as $k => $v) {
                 if ($k == 'USD') {
                     // 美元就直接取
@@ -194,7 +211,7 @@ class MarketDataService {
                     ];
                 }
             }
-            
+
             // 整理出字串
             $str_exchange_rate = $this->formatExchangeRateInfo($data_exchange_rate);
             if ($str_exchange_rate == '') {
@@ -214,10 +231,10 @@ class MarketDataService {
             } else {
                 return [$str_topic_data];
             }
-            
+
         }
     }
-    
+
     /**
      * 美化加權指數資料
      * @param unknown $tse      今天的加權指數
@@ -235,7 +252,7 @@ class MarketDataService {
 
             // 漲跌文字
             $updown = $this->UpDownIconText($difference);
-            
+
             // 文字模版
             $tse_index_format = '%d/%d/%d 加權指數 %.2f %s %.2f （%.2f%%）成交量：%.2f 億';
             $tse_index_string = sprintf($tse_index_format, date('Y'), date('m'), date('d'), $tse, $updown, abs($difference), $percent, $volume);
@@ -245,7 +262,35 @@ class MarketDataService {
             return '';
         }
     }
-    
+
+    /**
+     * 美化櫃買指數資料
+     * @param unknown $tse      今天的櫃買指數
+     * @param unknown $tse_last 昨天的櫃買指數
+     * @param unknown $volume   成交量
+     */
+    private function formatOtcIndexInfo($otc, $otc_last, $volume) {
+        if (is_numeric($otc) &&
+            is_numeric($otc_last) &&
+            is_numeric($volume)) {
+            // 算漲跌點數和百分比
+            $difference = $otc - $otc_last;
+            $percent = $difference / $otc_last * 100;
+            $volume = $volume / 100;
+
+            // 漲跌文字
+            $updown = $this->UpDownIconText($difference);
+
+            // 文字模版
+            $otc_index_format = '%d/%d/%d 櫃買指數 %.2f %s %.2f （%.2f%%）成交量：%.2f 億';
+            $otc_index_string = sprintf($otc_index_format, date('Y'), date('m'), date('d'), $otc, $updown, abs($difference), $percent, $volume);
+            return $otc_index_string;
+        } else {
+            Log::error('無法正確處理櫃買指數資料');
+            return '';
+        }
+    }
+
     /**
      * 美化三大法人買賣超資料
      * @param unknown $foreign
@@ -262,19 +307,19 @@ class MarketDataService {
             is_numeric(str_replace(',', '', $futures_fund)) &&
             is_numeric(str_replace(',', '', $futures_self))
             ) {
-            
+
             // 四捨五入到億元
             $foreign_billion = round($foreign / 100000000);
             $fund_billion = round($fund / 100000000);
             $self_billion = round($self / 100000000);
-            
+
             // 文字模版
             $juridical_exchange_format = '%d/%d/%d 台股三大法人動向 外資%s %d 億 投信%s %d 億 自營商%s %d 億 ' . $line_break . '台股指數期貨未平倉口數 外資 %s 口 投信 %s 口 自營商 %s 口';
             $juridical_exchange_string = sprintf(
-                $juridical_exchange_format, 
-                date('Y'), 
-                date('m'), 
-                date('d'), 
+                $juridical_exchange_format,
+                date('Y'),
+                date('m'),
+                date('d'),
                 $this->buySellText($foreign),
                 abs($foreign_billion),
                 $this->buySellText($fund),
@@ -291,7 +336,7 @@ class MarketDataService {
             return '';
         }
     }
-    
+
     /**
      * 美化美股四大指數資料
      * @param unknown $index_data
@@ -310,9 +355,9 @@ class MarketDataService {
             $us_index_string .= $row;
         }
         return $us_index_string;
-        
+
     }
-    
+
     /**
      * 美化匯率資料
      * @param unknown $exchange_rate
@@ -329,9 +374,9 @@ class MarketDataService {
         $exchange_rate_string .= $line_break;
         $exchange_rate_string .= '註：以上為該幣別兌新台幣的數值';
         return $exchange_rate_string;
-        
+
     }
-    
+
     /**
      * 美化金融話題資料
      * @param unknown $topic_data
@@ -341,7 +386,7 @@ class MarketDataService {
         $str = '#' . $topic_data['topic'] . $line_break . $line_break . $topic_data['content'];
         return $str;
     }
-    
+
     /**
      * 去除數字逗號
      * @param string $num
@@ -349,7 +394,7 @@ class MarketDataService {
     private function removeNumberComma(string $num) {
         return floatval(str_replace(',', '', $num));
     }
-    
+
     /**
      * 傳回買賣超文字
      * @param unknown $amount
@@ -361,7 +406,7 @@ class MarketDataService {
             return '賣超';
         }
     }
-    
+
     /**
      * 漲跌文字
      * @param unknown $amount
