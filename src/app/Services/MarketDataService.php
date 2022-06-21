@@ -276,7 +276,6 @@ class MarketDataService {
             // 算漲跌點數和百分比
             $difference = $otc - $otc_last;
             $percent = $difference / $otc_last * 100;
-            $volume = $volume / 100;
 
             // 漲跌文字
             $updown = $this->UpDownIconText($difference);
